@@ -5,7 +5,7 @@ A modern, responsive GPA (Grade Point Average) calculator with support for both 
 ## ✨ Features
 
 - **Subject Management**: Add unlimited subjects with name, credits, and grade points
-- **Dual GPA Display**: Calculate both SGPA and CGPA simultaneously
+- **Dual GPA Display**: Displays both SGPA and CGPA (both show the same calculated GPA for the current semester)
 - **Real-time Calculation**: Instant GPA updates as you add or remove subjects
 - **Dark/Light Theme**: Toggle between themes with persistent preference storage
 - **Responsive Design**: Optimized for mobile, tablet, and desktop devices
@@ -65,15 +65,12 @@ Toggle between light and dark themes using the button in the top-right corner. Y
 
 ### Browser Compatibility
 
-- Chrome/Edge 88+
-- Firefox 85+
-- Safari 14+
-- Opera 74+
+Works on all modern browsers that support CSS Grid, CSS Custom Properties, and ES6 JavaScript.
 
 ### Key Features Implementation
 
 - **Responsive Layout**: CSS Grid and Flexbox for adaptive design
-- **Accessibility**: Semantic HTML and ARIA labels
+- **Accessibility**: Semantic HTML and labeled form inputs
 - **Smooth Animations**: CSS transitions and keyframe animations
 - **Mobile Optimizations**: Touch-friendly buttons, optimized viewport settings
 - **Input Modes**: Decimal keyboard for numeric inputs on mobile
