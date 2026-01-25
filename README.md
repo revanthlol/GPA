@@ -70,7 +70,7 @@ Works on all modern browsers that support CSS Grid, CSS Custom Properties, and E
 ### Key Features Implementation
 
 - **Responsive Layout**: CSS Grid and Flexbox for adaptive design
-- **Accessibility**: Semantic HTML and labeled form inputs
+- **Semantic HTML**: Proper HTML structure with labeled form inputs
 - **Smooth Animations**: CSS transitions and keyframe animations
 - **Mobile Optimizations**: Touch-friendly buttons, optimized viewport settings
 - **Input Modes**: Decimal keyboard for numeric inputs on mobile
