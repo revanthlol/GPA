@@ -2,383 +2,505 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPA Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Modern GPA Calculator</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
         :root {
-            --primary-color: #007bff;
-            --secondary-color: #6c757d;
-            --success-color: #28a745;
-            --error-color: #dc3545;
-            --light-bg: #f8f9fa;
-            --light-card: #ffffff;
-            --light-text: #212529;
-            --light-text-secondary: #6c757d;
-            --light-border: #dee2e6;
-            --light-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-
-            --dark-bg: #12181b;
-            --dark-card: #1a2226;
-            --dark-text: #e1e9f0;
-            --dark-text-secondary: #adb5bd;
-            --dark-border: #343a40;
-            --dark-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
-
-            --bg-color: var(--light-bg);
-            --card-color: var(--light-card);
-            --text-color: var(--light-text);
-            --text-secondary-color: var(--light-text-secondary);
-            --border-color: var(--light-border);
-            --shadow: var(--light-shadow);
-            --transition-speed: 0.3s;
+            /* Light Theme */
+            --primary: #6366f1; /* Indigo */
+            --primary-hover: #4f46e5;
+            --bg-body: #f3f4f6;
+            --bg-card: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --input-bg: #f9fafb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 16px;
         }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --primary: #818cf8;
+            --primary-hover: #6366f1;
+            --bg-body: #0f172a; /* Slate 900 */
+            --bg-card: #1e293b; /* Slate 800 */
+            --text-main: #f3f4f6;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --input-bg: #0f172a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        body.dark-mode {
-            --bg-color: var(--dark-bg);
-            --card-color: var(--dark-card);
-            --text-color: var(--dark-text);
-            --text-secondary-color: var(--dark-text-secondary);
-            --border-color: var(--dark-border);
-            --shadow: var(--dark-shadow);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding: 20px;
-            transition: background-color var(--transition-speed), color var(--transition-speed);
+            padding: 20px 15px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .calculator-container {
-            width: 100%; max-width: 800px;
-            background-color: var(--card-color);
-            border-radius: 16px; box-shadow: var(--shadow);
-            overflow: hidden; transition: background-color var(--transition-speed);
+        .app-container {
+            width: 100%;
+            max-width: 600px; /* Optimal width for readability */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
-        
+
+        /* --- Header & Theme Toggle --- */
         header {
-            background-image: linear-gradient(45deg, var(--primary-color), #0056b3);
-            color: white; padding: 25px; text-align: center; position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5px;
         }
-        header h1 { font-weight: 700; }
+        
+        .brand h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; }
+        .brand span { color: var(--primary); }
+        .brand p { font-size: 0.85rem; color: var(--text-muted); }
 
-        .theme-switcher {
-            position: absolute; top: 20px; right: 20px; cursor: pointer;
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
         }
-        #darkModeToggle { display: none; }
-        .toggle-label {
-            display: flex; align-items: center; justify-content: center;
-            width: 50px; height: 26px; background-color: rgba(0,0,0,0.3);
-            border-radius: 50px; position: relative; transition: background-color var(--transition-speed);
-        }
-        .toggle-label::after {
-            content: '🌙'; font-size: 14px; color: yellow;
-            position: absolute; left: 5px;
-            transition: transform var(--transition-speed) ease-in-out;
-        }
-        #darkModeToggle:checked + .toggle-label { background-color: rgba(255,255,255,0.3); }
-        #darkModeToggle:checked + .toggle-label::after {
-            content: '☀️'; color: orange; transform: translateX(24px);
-        }
+        .theme-toggle:active { transform: scale(0.95); }
 
-        main { padding: 25px; display: grid; gap: 25px; }
-
-        .card {
-            background-color: var(--card-color);
-            border: 1px solid var(--border-color); border-radius: 12px;
-            padding: 20px; transition: all var(--transition-speed) ease;
-        }
-        .card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
-        .card h2 {
-            font-size: 1.3rem; font-weight: 600; margin-bottom: 20px;
-            border-left: 4px solid var(--primary-color); padding-left: 12px;
-        }
-        .input-form { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 15px; align-items: center; }
-        .input-group label { font-size: 0.85rem; color: var(--text-secondary-color); margin-bottom: 5px; }
-        input[type="text"], input[type="number"] {
-            width: 100%; padding: 12px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-color); color: var(--text-color);
-            border-radius: 8px; font-family: 'Poppins', sans-serif;
-            font-size: 0.95rem; transition: all var(--transition-speed);
-        }
-        input:focus {
-            outline: none; border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
+        /* --- Score Cards (Dashboard) --- */
+        .score-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
 
+        .score-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .score-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--primary), #c084fc);
+        }
+
+        .score-card h3 { font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 5px; }
+        .score-card .value { font-size: 2.5rem; font-weight: 800; color: var(--text-main); line-height: 1; }
+        
+        /* --- Main Content Card --- */
+        .main-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+
+        h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        h2::before { content: ''; width: 4px; height: 18px; background: var(--primary); border-radius: 2px; display: block; }
+
+        /* --- Input Form --- */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .input-group { position: relative; }
+        .input-group label {
+            display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+            margin-bottom: 6px; margin-left: 2px;
+        }
+
+        input {
+            width: 100%;
+            background: var(--input-bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 1rem;
+            color: var(--text-main);
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+        
         .btn {
-            padding: 12px 20px; border: none; border-radius: 8px;
-            cursor: pointer; font-family: 'Poppins', sans-serif;
-            font-weight: 600; font-size: 0.95rem;
-            transition: all var(--transition-speed) ease;
-            align-self: end;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
         }
-        .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .btn:active { transform: translateY(0); box-shadow: none; }
-        .btn:disabled {
-            background-color: var(--text-secondary-color);
-            cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.7;
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text-muted); }
+        .btn-outline:hover { border-color: var(--text-muted); color: var(--text-main); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+
+        /* --- Table List --- */
+        .list-container {
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
         }
         
-        #subjects-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        #subjects-table th, #subjects-table td {
-            padding: 14px; text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: var(--input-bg); position: sticky; top: 0; z-index: 10; }
+        th { text-align: left; padding: 12px 16px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+        tr:last-child td { border-bottom: none; }
         
-        .results-area { display: flex; justify-content: space-around; text-align: center; }
-        .result-box .value {
-            font-size: 2.8rem; font-weight: 700; color: var(--primary-color);
-            line-height: 1.2; transition: color var(--transition-speed);
+        .delete-btn {
+            background: none; border: none; color: var(--text-muted);
+            cursor: pointer; padding: 6px; border-radius: 6px; transition: 0.2s;
         }
-        .result-updated { animation: popIn 0.5s ease-out; }
-        @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 70% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); } }
+        .delete-btn:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
 
-        .actions-area { display: flex; gap: 15px; justify-content: center; }
-        #calculate-cgpa-btn { background-color: var(--success-color); color: white; }
-        #reset-all-btn { background-color: var(--error-color); color: white; }
+        .empty-state { text-align: center; padding: 30px 10px; color: var(--text-muted); font-size: 0.9rem; }
 
-        .row-enter-active { animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 1000; }
-        .toast {
-            background-color: var(--card-color); color: var(--text-color);
-            padding: 15px 20px; border-radius: 8px; box-shadow: var(--shadow);
-            margin-bottom: 10px; border-left: 5px solid;
-            opacity: 0; transform: translateX(100%);
-            animation: slideIn 0.5s forwards;
+        /* --- Footer Actions --- */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
         }
-        .toast.success { border-color: var(--success-color); }
-        .toast.error { border-color: var(--error-color); }
-        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
-        @keyframes slideOut { to { opacity: 0; transform: translateX(120%); } }
+        .full-width { grid-column: span 2; }
 
+        /* --- Mobile Adaptations --- */
+        @media (max-width: 480px) {
+            .input-grid {
+                grid-template-columns: 1fr 1fr; /* Name takes full width in row 1, others share row 2 */
+            }
+            .input-group:nth-child(1) { grid-column: span 2; }
+            
+            .score-card .value { font-size: 2rem; }
+        }
+
+        /* --- Animations & Utilities --- */
+        .hidden { display: none; }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-entry { animation: slideUp 0.3s ease-out forwards; }
+
+        /* Toast Notification */
+        #toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--text-main); color: var(--bg-card);
+            padding: 12px 24px; border-radius: 50px;
+            font-size: 0.9rem; font-weight: 500;
+            box-shadow: var(--shadow-lg); opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100; display: flex; align-items: center; gap: 8px; white-space: nowrap;
+        }
+        #toast.active { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* Modal */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; transition: all var(--transition-speed); z-index: 2000;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: 0.3s; z-index: 50;
         }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
-        .modal-content {
-            background-color: var(--card-color); padding: 30px;
-            border-radius: 12px; text-align: center;
-            transform: scale(0.9); transition: transform var(--transition-speed);
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal {
+            background: var(--bg-card); width: 90%; max-width: 320px;
+            padding: 25px; border-radius: var(--radius); text-align: center;
+            transform: scale(0.9); transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .modal-overlay.active .modal-content { transform: scale(1); }
-        .modal-content h3 { margin-bottom: 10px; font-weight: 600; }
-        .modal-content p { color: var(--text-secondary-color); margin-bottom: 25px; }
-        .modal-actions .btn { margin: 0 10px; }
-        
-        @media (max-width: 768px) {
-            body { padding: 0; }
-            .calculator-container { border-radius: 0; }
-            main { padding: 20px; }
-            .input-form { grid-template-columns: 1fr; gap: 20px; }
-            .btn { width: 100%; }
-            .actions-area, .results-area { flex-direction: column; gap: 20px; }
-        }
+        .modal-overlay.active .modal { transform: scale(1); }
     </style>
 </head>
 <body>
-    <div class="calculator-container">
+
+    <div class="app-container">
+        <!-- Header -->
         <header>
-            <div class="theme-switcher">
-                <input type="checkbox" id="darkModeToggle">
-                <label for="darkModeToggle" class="toggle-label"></label>
+            <div class="brand">
+                <h1>GPA <span>Calc</span></h1>
+                <p>Track your academic progress</p>
             </div>
-            <h1>GPA Calculator</h1>
-            <p>For SGPA & CGPA Calculation</p>
+            <button class="theme-toggle" id="themeBtn" aria-label="Toggle Dark Mode">
+                🌙
+            </button>
         </header>
-        <main>
-            <section class="card">
-                <h2>Add a Subject</h2>
-                <div class="input-form">
-                    <div class="input-group"><label for="subject-name">Subject Name</label><input type="text" id="subject-name" placeholder="e.g., Advanced Algo"></div>
-                    <div class="input-group"><label for="subject-credits">Credits</label><input type="number" id="subject-credits" min="0" placeholder="e.g., 4"></div>
-                    <div class="input-group"><label for="subject-points">Points</label><input type="number" id="subject-points" min="0" max="10" step="0.01" placeholder="e.g., 9.5"></div>
-                    <button id="add-subject-btn" class="btn btn-primary">Add</button>
-                </div>
-            </section>
 
-            <section class="card">
-                <h2>Entered Subjects</h2>
-                <table id="subjects-table"><thead><tr><th>Subject</th><th>Credits</th><th>Points</th></tr></thead><tbody></tbody></table>
-            </section>
+        <!-- Results Dashboard -->
+        <section class="score-board">
+            <div class="score-card">
+                <h3>SGPA</h3>
+                <div class="value" id="sgpa-display">0.00</div>
+            </div>
+            <div class="score-card">
+                <h3>CGPA</h3>
+                <div class="value" id="cgpa-display">0.00</div>
+            </div>
+        </section>
 
-            <section class="card">
-                <h2>Results & Actions</h2>
-                <div class="results-area">
-                    <div class="result-box"><h3>SGPA</h3><p class="value" id="sgpa-result">0.00</p></div>
-                    <div class="result-box"><h3>CGPA</h3><p class="value" id="cgpa-result">0.00</p></div>
+        <!-- Input Area -->
+        <main class="main-card">
+            <h2>Add Subject</h2>
+            
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Subject</label>
+                    <input type="text" id="subName" placeholder="e.g. Math" autocomplete="off">
                 </div>
-                <div class="actions-area" style="margin-top: 20px;">
-                    <button id="calculate-sgpa-btn" class="btn btn-secondary">Calculate SGPA</button>
-                    <button id="calculate-cgpa-btn" class="btn">Calculate CGPA</button>
-                    <button id="reset-all-btn" class="btn">Reset All</button>
+                <div class="input-group">
+                    <label>Credit</label>
+                    <input type="number" id="subCredit" placeholder="4" inputmode="decimal">
                 </div>
-            </section>
+                <div class="input-group">
+                    <label>Points</label>
+                    <input type="number" id="subPoint" placeholder="9.0" inputmode="decimal">
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="addBtn">
+                <span>+ Add Subject</span>
+            </button>
+
+            <h2 style="margin-top: 30px;">Course List</h2>
+            <div class="list-container">
+                <table id="courseTable">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th style="width: 60px;">Cr</th>
+                            <th style="width: 60px;">Pt</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Rows go here -->
+                    </tbody>
+                </table>
+                <div id="emptyState" class="empty-state">
+                    No subjects added yet.
+                </div>
+            </div>
+
+            <div class="action-grid">
+                <button class="btn btn-outline" id="resetBtn">Reset</button>
+                <button class="btn btn-primary" style="background: var(--success);" id="calcBtn">Calculate</button>
+            </div>
         </main>
     </div>
-    
-    <div id="toast-container"></div>
-    <div id="confirm-modal" class="modal-overlay">
-        <div class="modal-content">
-            <h3>Are you sure?</h3>
-            <p>This will erase all subjects from the list. This action cannot be undone.</p>
-            <div class="modal-actions">
-                <button id="confirm-reset-btn" class="btn btn-primary" style="background-color: var(--error-color);">Yes, Reset</button>
-                <button id="cancel-reset-btn" class="btn btn-secondary">Cancel</button>
+
+    <!-- Toast Notification -->
+    <div id="toast">✅ Saved successfully</div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal">
+            <h3 style="margin-bottom: 10px;">Reset Calculator?</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">This will delete all your entered subjects. This action cannot be undone.</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-outline" id="cancelReset">Cancel</button>
+                <button class="btn btn-danger" id="confirmReset">Yes, Reset</button>
             </div>
         </div>
     </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const applyTheme = (theme) => {
-        document.body.classList.toggle('dark-mode', theme === 'dark');
-        darkModeToggle.checked = theme === 'dark';
-    };
-    const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    applyTheme(savedTheme);
-    darkModeToggle.addEventListener('change', () => {
-        const newTheme = darkModeToggle.checked ? 'dark' : 'light';
-        localStorage.setItem('theme', newTheme);
-        applyTheme(newTheme);
-    });
+    <script>
+        // State Management
+        let subjects = [];
+        
+        // DOM Elements
+        const themeBtn = document.getElementById('themeBtn');
+        const nameInput = document.getElementById('subName');
+        const creditInput = document.getElementById('subCredit');
+        const pointInput = document.getElementById('subPoint');
+        const addBtn = document.getElementById('addBtn');
+        const tableBody = document.getElementById('tableBody');
+        const emptyState = document.getElementById('emptyState');
+        const sgpaDisplay = document.getElementById('sgpa-display');
+        const cgpaDisplay = document.getElementById('cgpa-display');
+        const toast = document.getElementById('toast');
+        const calcBtn = document.getElementById('calcBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const modal = document.getElementById('confirmModal');
+        const confirmReset = document.getElementById('confirmReset');
+        const cancelReset = document.getElementById('cancelReset');
 
-    let allSubjects = [];
-    const { subjectNameInput, subjectCreditsInput, subjectPointsInput, addSubjectBtn, subjectsTableBody, calculateSGPABtn, sgpaResultEl, calculateCGPABtn, cgpaResultEl, resetAllBtn, confirmModal, confirmResetBtn, cancelResetBtn } = {
-        subjectNameInput: document.getElementById('subject-name'), subjectCreditsInput: document.getElementById('subject-credits'),
-        subjectPointsInput: document.getElementById('subject-points'), addSubjectBtn: document.getElementById('add-subject-btn'),
-        subjectsTableBody: document.querySelector('#subjects-table tbody'), calculateSGPABtn: document.getElementById('calculate-sgpa-btn'),
-        sgpaResultEl: document.getElementById('sgpa-result'), calculateCGPABtn: document.getElementById('calculate-cgpa-btn'),
-        cgpaResultEl: document.getElementById('cgpa-result'), resetAllBtn: document.getElementById('reset-all-btn'),
-        confirmModal: document.getElementById('confirm-modal'), confirmResetBtn: document.getElementById('confirm-reset-btn'),
-        cancelResetBtn: document.getElementById('cancel-reset-btn')
-    };
-    
-    const showToast = (message, type = 'success') => {
-        const toastContainer = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        toastContainer.appendChild(toast);
-        setTimeout(() => {
-            toast.style.animation = 'slideOut 0.5s forwards';
-            toast.addEventListener('animationend', () => toast.remove());
-        }, 3000);
-    };
-
-    const animateResult = (element, value) => {
-        element.textContent = value;
-        element.classList.add('result-updated');
-        element.addEventListener('animationend', () => element.classList.remove('result-updated'), { once: true });
-    };
-    
-    const updateButtonStates = () => {
-        const hasSubjects = allSubjects.length > 0;
-        calculateSGPABtn.disabled = !hasSubjects;
-        calculateCGPABtn.disabled = !hasSubjects;
-    };
-
-    const addSubject = () => {
-        const name = subjectNameInput.value.trim() || `Subject ${allSubjects.length + 1}`;
-        const credits = parseFloat(subjectCreditsInput.value);
-        const pointValue = parseFloat(subjectPointsInput.value);
-
-        if (isNaN(credits) || credits <= 0) { showToast('Please enter valid credits.', 'error'); return; }
-        if (isNaN(pointValue) || pointValue < 0 || pointValue > 10) { showToast('Point value must be between 0 and 10.', 'error'); return; }
-
-        allSubjects.push({ name, credits, pointValue });
-        updateSubjectsTable();
-        clearInputs();
-        showToast(`'${name}' added successfully!`, 'success');
-    };
-
-    const updateSubjectsTable = () => {
-        subjectsTableBody.innerHTML = '';
-        if (allSubjects.length === 0) {
-            subjectsTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-secondary-color);">Add subjects to get started...</td></tr>';
-        } else {
-            allSubjects.forEach(subject => {
-                const row = subjectsTableBody.insertRow();
-                row.className = 'row-enter-active';
-                row.innerHTML = `<td>${subject.name}</td><td>${subject.credits}</td><td>${subject.pointValue.toFixed(2)}</td>`;
-            });
+        // --- Theme Logic ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            themeBtn.innerHTML = savedTheme === 'dark' ? '☀️' : '🌙';
         }
-        updateButtonStates();
-    };
-
-    const clearInputs = () => {
-        [subjectNameInput, subjectCreditsInput, subjectPointsInput].forEach(input => input.value = '');
-        subjectNameInput.focus();
-    };
-
-    const calculateGPA = () => {
-        if (allSubjects.length === 0) return 0;
-        let totalPoints = 0, totalCredits = 0;
-        allSubjects.forEach(s => {
-            totalPoints += s.credits * s.pointValue;
-            totalCredits += s.credits;
+        
+        themeBtn.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            themeBtn.innerHTML = next === 'dark' ? '☀️' : '🌙';
         });
-        return totalCredits > 0 ? (totalPoints / totalCredits) : 0;
-    };
 
-    const calculateAndDisplaySGPA = () => {
-        const gpa = calculateGPA();
-        animateResult(sgpaResultEl, gpa.toFixed(2));
-        showToast('SGPA calculated for the entered subjects.', 'success');
-    };
+        // --- Core Logic ---
+        function updateUI() {
+            tableBody.innerHTML = '';
+            
+            if (subjects.length === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+                subjects.forEach((sub, index) => {
+                    const row = document.createElement('tr');
+                    row.className = 'animate-entry';
+                    row.innerHTML = `
+                        <td><div style="font-weight: 500;">${sub.name}</div></td>
+                        <td>${sub.credit}</td>
+                        <td>${sub.point}</td>
+                        <td style="text-align: right;">
+                            <button class="delete-btn" onclick="removeSubject(${index})">✕</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
 
-    const calculateAndDisplayCGPA = () => {
-        const gpa = calculateGPA();
-        animateResult(cgpaResultEl, gpa.toFixed(2));
-        // Also update SGPA since it's the same list
-        animateResult(sgpaResultEl, gpa.toFixed(2)); 
-        showToast('CGPA calculated for all entered subjects.', 'success');
-    };
+        function showToast(msg, isError = false) {
+            toast.textContent = msg;
+            toast.style.background = isError ? 'var(--danger)' : 'var(--text-main)';
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 3000);
+        }
 
-    const resetAll = () => {
-        allSubjects = [];
-        updateSubjectsTable();
-        animateResult(sgpaResultEl, '0.00');
-        animateResult(cgpaResultEl, '0.00');
-        clearInputs();
-        showToast('Calculator has been reset.', 'success');
-    };
+        function addSubject() {
+            const name = nameInput.value.trim() || `Subject ${subjects.length + 1}`;
+            const credit = parseFloat(creditInput.value);
+            const point = parseFloat(pointInput.value);
 
-    resetAllBtn.addEventListener('click', () => confirmModal.classList.add('active'));
-    cancelResetBtn.addEventListener('click', () => confirmModal.classList.remove('active'));
-    confirmResetBtn.addEventListener('click', () => {
-        resetAll();
-        confirmModal.classList.remove('active');
-    });
+            if (isNaN(credit) || credit <= 0) {
+                showToast('⚠️ Enter valid credits', true);
+                return;
+            }
+            if (isNaN(point) || point < 0 || point > 10) {
+                showToast('⚠️ Points must be 0-10', true);
+                return;
+            }
 
-    addSubjectBtn.addEventListener('click', addSubject);
-    calculateSGPABtn.addEventListener('click', calculateAndDisplaySGPA);
-    calculateCGPABtn.addEventListener('click', calculateAndDisplayCGPA);
-    [subjectNameInput, subjectCreditsInput, subjectPointsInput].forEach(input => {
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') addSubject();
+            subjects.push({ name, credit, point });
+            updateUI();
+            
+            // Clear inputs and refocus name
+            nameInput.value = '';
+            creditInput.value = '';
+            pointInput.value = '';
+            nameInput.focus();
+            
+            showToast('Subject Added');
+        }
+
+        window.removeSubject = (index) => {
+            subjects.splice(index, 1);
+            updateUI();
+            calculateGPA(); // Auto recalculate on delete? Or wait for click. Let's wait.
+        };
+
+        function calculateGPA() {
+            if (subjects.length === 0) {
+                sgpaDisplay.textContent = '0.00';
+                cgpaDisplay.textContent = '0.00';
+                showToast('Add subjects first', true);
+                return;
+            }
+
+            let totalPoints = 0;
+            let totalCredits = 0;
+
+            subjects.forEach(sub => {
+                totalPoints += (sub.credit * sub.point);
+                totalCredits += sub.credit;
+            });
+
+            const gpa = totalCredits === 0 ? 0 : (totalPoints / totalCredits);
+            const gpaStr = gpa.toFixed(2);
+
+            // Animate Numbers
+            sgpaDisplay.textContent = gpaStr;
+            cgpaDisplay.textContent = gpaStr; // Assuming SGPA = CGPA for this batch
+            
+            // Visual pulse effect
+            sgpaDisplay.style.transform = 'scale(1.2)';
+            setTimeout(() => sgpaDisplay.style.transform = 'scale(1)', 200);
+            
+            showToast('GPA Calculated successfully!');
+        }
+
+        // --- Event Listeners ---
+        addBtn.addEventListener('click', addSubject);
+        
+        // Allow "Enter" key to submit
+        [nameInput, creditInput, pointInput].forEach(input => {
+            input.addEventListener('keydown', (e) => {
+                if(e.key === 'Enter') addSubject();
+            });
         });
-    });
 
-    updateSubjectsTable();
-});
-</script>
+        calcBtn.addEventListener('click', calculateGPA);
+        
+        resetBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        cancelReset.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        confirmReset.addEventListener('click', () => {
+            subjects = [];
+            updateUI();
+            sgpaDisplay.textContent = '0.00';
+            cgpaDisplay.textContent = '0.00';
+            modal.classList.remove('active');
+            showToast('All data cleared');
+        });
+
+        // Initialize
+        initTheme();
+        updateUI();
+
+    </script>
 </body>
 </html>
