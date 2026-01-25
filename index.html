@@ -12,8 +12,8 @@
     <style>
         :root {
             /* --- DEEP BLACK MODE (Default) --- */
-            --bg-body: #000000;        /* Pure Black */
-            --bg-card: #0c0c0c;        /* Slightly off-black for cards */
+            --bg-body: #000000;
+            --bg-card: #0c0c0c;
             --bg-input: #000000;
             
             --primary: #ffffff;
@@ -22,32 +22,32 @@
             --text-main: #ffffff;
             --text-muted: #888888;
             
-            --border: #27272a;         /* Visible Grey Lines */
+            --border: #27272a;
             --border-focus: #52525b;
             
             --danger: #ef4444;         
             
             /* Curvy Settings */
-            --radius-card: 24px;       /* Very round cards */
-            --radius-elem: 16px;       /* Round inputs/buttons */
+            --radius-card: 24px;
+            --radius-elem: 16px;
             
             --font-main: 'Plus Jakarta Sans', sans-serif;
         }
 
         /* --- LIGHT MODE --- */
         [data-theme="light"] {
-            --bg-body: #f4f4f5;
-            --bg-card: #ffffff;
-            --bg-input: #fcfcfc;
+            --bg-body: #f7f7f4;
+            --bg-card: #fbfbf9;
+            --bg-input: #f3f3ef;
             
-            --primary: #18181b;
+            --primary: #2a2a2e;
             --primary-text: #ffffff;
             
-            --text-main: #09090b;
-            --text-muted: #71717a;
+            --text-main: #1f1f23;
+            --text-muted: #6b6b73;
             
-            --border: #e4e4e7;
-            --border-focus: #a1a1aa;
+            --border: #deded8;
+            --border-focus: #9a9aa3;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -197,17 +197,23 @@
         .btn-calc:hover { background: #1d4ed8; }
         [data-theme="light"] .btn-calc { background: #000; color: #fff; }
 
+        .btn-danger-text { color: var(--danger); border-color: var(--border); }
+        .btn-danger-text:hover { border-color: var(--danger); background: rgba(239,68,68,0.1); }
+        
+        .btn-danger-fill { background: var(--danger); color: white; }
+        .btn-danger-fill:active { transform: scale(0.98); }
+
         /* --- Grid Table --- */
         .table-container {
             margin-top: 30px;
             border: 1px solid var(--border);
             border-radius: var(--radius-elem);
-            overflow: hidden; /* Ensures corners clip */
+            overflow: hidden; 
         }
         
         table { 
             width: 100%; 
-            border-collapse: collapse; /* Crucial for grid lines */
+            border-collapse: collapse; 
             border-spacing: 0;
         }
         
@@ -233,7 +239,6 @@
             background: var(--bg-input);
         }
         
-        /* Remove outer borders inside the container */
         th:last-child, td:last-child { border-right: none; }
         tr:last-child td { border-bottom: none; }
         
@@ -248,15 +253,38 @@
             display: grid; grid-template-columns: 1fr 2fr; gap: 12px; margin-top: 25px;
         }
 
+        /* --- Modal Styling --- */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 200;
+            opacity: 0; pointer-events: none; transition: 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .modal-box {
+            background: var(--bg-card);
+            width: 90%; max-width: 350px;
+            border-radius: var(--radius-card);
+            padding: 30px;
+            border: 1px solid var(--border);
+            text-align: center;
+            transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+
+        .modal-title { font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
+        .modal-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px; line-height: 1.5; font-weight: 500; }
+        
+        .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
         /* Mobile */
         @media (max-width: 480px) {
-            .input-grid { 
-                grid-template-columns: 1fr 1fr; 
-                gap: 10px;
-            }
+            .input-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
             .input-wrapper:first-child { grid-column: span 2; }
-            
-            /* Tighten table on small screens */
             th, td { padding: 12px 10px; font-size: 0.85rem; }
             th { font-size: 0.7rem; }
         }
@@ -345,6 +373,18 @@
         </main>
     </div>
 
+    <!-- Custom Modal for Reset -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div class="modal-title">Reset Calculator?</div>
+            <p class="modal-desc">This will permanently remove all your entered subjects. This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="cancelModal">Cancel</button>
+                <button class="btn btn-danger-fill" id="confirmModal">Yes, Reset</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast">Notification</div>
 
     <script>
@@ -352,6 +392,12 @@
         const tableBody = document.getElementById('tableBody');
         const themeBtn = document.getElementById('themeBtn');
         const svgIcon = themeBtn.querySelector('svg');
+
+        // Modal Elements
+        const modalOverlay = document.getElementById('modalOverlay');
+        const resetBtn = document.getElementById('resetBtn');
+        const cancelModal = document.getElementById('cancelModal');
+        const confirmModal = document.getElementById('confirmModal');
 
         // Theme Icons
         const ICON_SUN = '<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.29 1.29c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.29 1.29c.18.19.43.29.68.29s.5-.09.71-.29a.996.996 0 000-1.41l-1.27-1.29zm0-14.14a.996.996 0 000 1.41l1.29 1.29c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.29-1.29a.996.996 0 00-1.41 0zm-14.14 14.14l-1.29 1.29c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.29-1.29a.996.996 0 000-1.41.996.996 0 00-1.41 0z"/>';
@@ -447,14 +493,32 @@
             showToast('Calculation Complete');
         });
 
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            if (subjects.length === 0) return;
-            if (confirm("Reset all data?")) {
-                subjects.length = 0;
-                render();
-                document.getElementById('sgpa').textContent = '0.00';
-                document.getElementById('cgpa').textContent = '0.00';
-            }
+        // --- Modal Logic ---
+        
+        // Open Modal
+        resetBtn.addEventListener('click', () => {
+            if (subjects.length === 0) return showToast('Nothing to reset');
+            modalOverlay.classList.add('active');
+        });
+
+        // Close Modal
+        const closeModal = () => {
+            modalOverlay.classList.remove('active');
+        };
+
+        cancelModal.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+
+        // Confirm Action
+        confirmModal.addEventListener('click', () => {
+            subjects.length = 0;
+            render();
+            document.getElementById('sgpa').textContent = '0.00';
+            document.getElementById('cgpa').textContent = '0.00';
+            closeModal();
+            showToast('Reset Successful');
         });
 
         [iName, iCredit, iPoint].forEach(input => {
